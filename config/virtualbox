@@ -12,7 +12,8 @@
 
 # Extract 7zipped VDI file, move to desired location
 # if your OS doesn't have a 7zip utility installed, you can download one from 7-zip.org
-# 7za e <archive file>, or on Mac OS X, you could double click on the .7z file if using Keka
+# 7za e <archive file>, or on Mac OS X, you could double click on the .7z file if using Keka 
+# (Keka is available for free at https://www.keka.io/en/)
 
 # Immediately following are instructions for the Virtualbox GUI. Command line instructions are at the end.
 
@@ -85,17 +86,21 @@ export HOST_ADAPTER=$(ifconfig | grep -B4 "status: active" | grep -B3 "inet " | 
 vboxmanage createvm --name $VMNAME --register
 vboxmanage modifyvm $VMNAME --ostype Ubuntu_64
 vboxmanage modifyvm $VMNAME --memory 2000
+#vboxmanage modifyvm $VMNAME --graphicscontroller none
+#vboxmanage modifyvm $VMNAME --audio none
 vboxmanage storagectl $VMNAME --name SATA --add sata --portcount 2 --controller IntelAhci --bootable on
 vboxmanage storageattach $VMNAME --storagectl SATA --port 0 --device 0 --type hdd --medium "$VDI"
 vboxmanage modifyvm $VMNAME --nic1 nat --nictype1 virtio
 vboxmanage modifyvm $VMNAME --nic2 hostonly --nictype2 82540EM
 # send serial console to a log file
-vboxmanage modifyvm k_grok --uart1 0x3F8 4
-vboxmanage modifyvm k_grok --uartmode1 file /tmp/k_grok-serial.log
+vboxmanage modifyvm $VMNAME --uart1 0x3F8 4
+vboxmanage modifyvm $VMNAME --uartmode1 file /tmp/k_grok-serial.log
 # this slows booting down, so if desired you can disable with
-# vboxmanage modifyvm k_grok --uartmode1 disconnected
+# vboxmanage modifyvm $VMNAME --uartmode1 disconnected
 
-# virtualbox --startvm k_grok
+# Start VM
+# On macOS Mojave: enable Terminal to control computer in Security & Privacy System Preferences
+vboxmanage startvm $VMNAME
 # password osboxes.org
 # start a terminal (either right click or search using the first panel button)
 # sudo -i
