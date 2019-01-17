@@ -74,8 +74,9 @@ export HOST_ADAPTER=$(ip link show up | grep "<BROAD" | cut -f2 -d":")
 export HOST_ADAPTER=$(ifconfig | grep -B4 "status: active" | grep -B3 "inet " | head -1 | cut -f1 -d":")
 
 # On your host:
-# vboxmanage dhcpserver --enable
-# vboxmanage hostonlyif create
+vboxmanage hostonlyif create
+# Assuming vboxnet1 was created
+vboxmanage dhcpserver add --ifname vboxnet1 --ip 192.168.56.2 --netmask 255.255.255.0 --lowerip 192.168.56.3 --upperip 192.168.56.254 --enable
 
 # For more info about these instructions, see:
 # https://www.virtualbox.org/manual/ch08.html
@@ -86,12 +87,11 @@ export HOST_ADAPTER=$(ifconfig | grep -B4 "status: active" | grep -B3 "inet " | 
 vboxmanage createvm --name $VMNAME --register
 vboxmanage modifyvm $VMNAME --ostype Ubuntu_64
 vboxmanage modifyvm $VMNAME --memory 2000
-#vboxmanage modifyvm $VMNAME --graphicscontroller none
-#vboxmanage modifyvm $VMNAME --audio none
 vboxmanage storagectl $VMNAME --name SATA --add sata --portcount 2 --controller IntelAhci --bootable on
 vboxmanage storageattach $VMNAME --storagectl SATA --port 0 --device 0 --type hdd --medium "$VDI"
 vboxmanage modifyvm $VMNAME --nic1 nat --nictype1 virtio
 vboxmanage modifyvm $VMNAME --nic2 hostonly --nictype2 82540EM
+vboxmanage modifyvm $VMNAME --hostonlyadapter2 vboxnet1
 # send serial console to a log file
 vboxmanage modifyvm $VMNAME --uart1 0x3F8 4
 vboxmanage modifyvm $VMNAME --uartmode1 file /tmp/k_grok-serial.log
