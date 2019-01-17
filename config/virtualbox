@@ -64,6 +64,7 @@
 # and then uncompressed it with a command such as the following:
 # p7zip -d Ubuntu_16.10_Yakkety-VB-64bit.7z
 
+# Variable Init phase
 export VM_DISK_DIR=$HOME/vm_disks
 export VDI="$VM_DISK_DIR/Ubuntu 16.10 Yakkety (64bit).vdi"
 export VMNAME=k_grok
@@ -73,6 +74,7 @@ export HOST_ADAPTER=$(ip link show up | grep "<BROAD" | cut -f2 -d":")
 # this may work on Mac OS X
 export HOST_ADAPTER=$(ifconfig | grep -B4 "status: active" | grep -B3 "inet " | head -1 | cut -f1 -d":")
 
+# Host configuration phase
 # On your host:
 vboxmanage hostonlyif create
 # Assuming vboxnet1 was created
@@ -84,22 +86,32 @@ vboxmanage dhcpserver add --ifname vboxnet1 --ip 192.168.56.2 --netmask 255.255.
 # http://www.edwardstafford.com/2009/09/13/virtualbox-and-bridged-networking-on-a-headless-ubuntu-server-host/
 # http://serverfault.com/questions/128685/how-can-i-get-the-bridged-ip-address-of-a-virtualbox-vm-running-in-headless-mode
 
+# VM creation phase
 vboxmanage createvm --name $VMNAME --register
 vboxmanage modifyvm $VMNAME --ostype Ubuntu_64
 vboxmanage modifyvm $VMNAME --memory 2000
+
+# VM storage config phase
 vboxmanage storagectl $VMNAME --name SATA --add sata --portcount 2 --controller IntelAhci --bootable on
 vboxmanage storageattach $VMNAME --storagectl SATA --port 0 --device 0 --type hdd --medium "$VDI"
+
+# VM network config phase
 vboxmanage modifyvm $VMNAME --nic1 nat --nictype1 virtio
 vboxmanage modifyvm $VMNAME --nic2 hostonly --nictype2 82540EM
 vboxmanage modifyvm $VMNAME --hostonlyadapter2 vboxnet1
+
+# VM console config phase (optional)
 # send serial console to a log file
 vboxmanage modifyvm $VMNAME --uart1 0x3F8 4
 vboxmanage modifyvm $VMNAME --uartmode1 file /tmp/k_grok-serial.log
 # this slows booting down, so if desired you can disable with
 # vboxmanage modifyvm $VMNAME --uartmode1 disconnected
 
+# VM Startup phase
 # Start VM
 vboxmanage startvm $VMNAME
+
+# End of phases
 # password osboxes.org
 # start a terminal (either right click or search using the first panel button)
 # sudo -i
