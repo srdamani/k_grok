@@ -99,7 +99,6 @@ vboxmanage modifyvm $VMNAME --uartmode1 file /tmp/k_grok-serial.log
 # vboxmanage modifyvm $VMNAME --uartmode1 disconnected
 
 # Start VM
-# On macOS Mojave: enable Terminal to control computer in Security & Privacy System Preferences
 vboxmanage startvm $VMNAME
 # password osboxes.org
 # start a terminal (either right click or search using the first panel button)
