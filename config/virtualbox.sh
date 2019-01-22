@@ -1,3 +1,4 @@
+#! /bin/bash
 # Download Virtualbox
 # https://www.virtualbox.org/wiki/Downloads
 
@@ -66,13 +67,16 @@
 
 # Variable Init phase
 export VM_DISK_DIR=$HOME/vm_disks
-export VDI="$VM_DISK_DIR/Ubuntu 16.10 Yakkety (64bit).vdi"
+export VDI="$VM_DISK_DIR/ubuntu.vdi"
 export VMNAME=k_grok
 # determine your host's primary network adapter ...
 # this may work on Linux
-export HOST_ADAPTER=$(ip link show up | grep "<BROAD" | cut -f2 -d":")
-# this may work on Mac OS X
-export HOST_ADAPTER=$(ifconfig | grep -B4 "status: active" | grep -B3 "inet " | head -1 | cut -f1 -d":")
+if [[ "$OSTYPE" == "linux-gnu" ]]; then
+  export HOST_ADAPTER=$(ip link show up | grep "<BROAD" | cut -f2 -d":")
+else
+  # this may work on Mac OS X
+  export HOST_ADAPTER=$(ifconfig | grep -B4 "status: active" | grep -B3 "inet " | head -1 | cut -f1 -d":")
+fi
 
 # Host configuration phase
 # On your host:
